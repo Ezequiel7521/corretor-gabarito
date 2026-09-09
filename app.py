@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- ESTILIZAÇÃO CSS CORRIGIDA PARA VISIBILIDADE DOS SELECTBOXES ---
+# --- ESTILIZAÇÃO CSS PERSONALIZADA ---
 st.markdown("""
     <style>
     /* Fundo geral e tipografia */
@@ -46,12 +46,12 @@ st.markdown("""
     }
     .author-tag {
         font-size: 0.75rem !important;
-        color: rgba(255, 255, 255, 0.6) !important;
+        color: rgba(255, 255, 255, 0.7) !important;
         margin-top: 8px !important;
         font-style: italic;
     }
 
-    /* Card da Área Selecionada */
+    /* Cards de informação e áreas */
     .info-card {
         background-color: #ffffff;
         border: 1px solid #cbd5e1;
@@ -79,52 +79,61 @@ st.markdown("""
         font-size: 2rem !important;
     }
 
-    /* CORREÇÃO DEFINITIVA DE VISIBILIDADE PARA SELECTBOX (GABARITO E ÁREAS) */
+    /* ESTILIZAÇÃO DA SIDEBAR E EXPANDER */
+    section[data-testid="stSidebar"] {
+        background-color: #0f172a !important;
+    }
+    
+    /* Textos gerais da Sidebar */
+    section[data-testid="stSidebar"] label, 
+    section[data-testid="stSidebar"] h3, 
+    section[data-testid="stSidebar"] h4 {
+        color: #f8fafc !important;
+    }
+
+    /* Correção do Expander (Editar Questão por Questão) */
+    section[data-testid="stSidebar"] div[data-testid="stExpander"] {
+        background-color: #1e293b !important;
+        border: 1px solid #334155 !important;
+        border-radius: 8px !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stExpander"] * {
+        color: #f1f5f9 !important;
+    }
+
+    /* Correção das caixas Selectbox (Opções A, B, C, D, E e Seleção de Áreas) */
     div[data-baseweb="select"] {
         background-color: #ffffff !important;
         border-radius: 8px !important;
     }
-    
     div[data-baseweb="select"] * {
         color: #0f172a !important;
         fill: #0f172a !important;
         font-weight: 600 !important;
     }
-
-    /* Estilo para a caixa fechada e a seta */
-    div[data-baseweb="select"] > div {
-        background-color: #ffffff !important;
-        border: 2px solid #94a3b8 !important;
-        border-radius: 8px !important;
-    }
-
-    /* Estilo das opções no menu suspenso que se abre */
     div[role="listbox"] {
         background-color: #ffffff !important;
     }
-    
     div[role="listbox"] li {
         color: #0f172a !important;
-        background-color: #ffffff !important;
     }
 
-    div[role="listbox"] li:hover {
-        background-color: #e2e8f0 !important;
-    }
-
-    /* Sidebar personalizada */
-    section[data-testid="stSidebar"] {
-        background-color: #0f172a !important;
-    }
-    section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] h3, section[data-testid="stSidebar"] h4 {
-        color: #f8fafc !important;
-    }
+    /* Botões da Sidebar */
     section[data-testid="stSidebar"] .stButton button {
         background-color: #2563eb !important;
-        color: white !important;
+        color: #ffffff !important;
         border: none !important;
         border-radius: 8px !important;
         font-weight: 600 !important;
+    }
+
+    /* Assinatura "by Prof. Ezequiel" bem legível */
+    .sidebar-signature {
+        color: #38bdf8 !important;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-align: center;
+        padding-top: 10px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -227,7 +236,7 @@ with st.sidebar.expander("✏️ Editar Questão por Questão"):
         st.success(f"Gabarito manual salvo!")
 
 st.sidebar.divider()
-st.sidebar.caption("💡 *by Prof. Ezequiel*")
+st.sidebar.markdown('<div class="sidebar-signature">💡 by Prof. Ezequiel</div>', unsafe_allow_html=True)
 
 # --- PROCESSAMENTO COM IA (GEMINI 3.6 FLASH) ---
 def ler_gabarito_com_ia(imagem_pil, api_key, estrutura):
@@ -262,7 +271,6 @@ def ler_gabarito_com_ia(imagem_pil, api_key, estrutura):
     
     return json.loads(texto_resposta)
 
-# API Key obtida dos Secrets do Streamlit Cloud
 api_key = st.secrets.get("GEMINI_API_KEY", "")
 
 # --- INTERFACE PRINCIPAL ---
