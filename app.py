@@ -33,10 +33,10 @@ with st.sidebar.form("form_gabarito"):
             )
     salvar = st.form_submit_button("Salvar Gabarito")
 
-# --- LEITURA ÓPTICA ROBUSTA ---
+# --- LEITURA ÓPTICA AJUSTADA (OMR) ---
 
 def processar_gabarito_preciso(imagem_np):
-    # Converter para escala de cinza e padronizar tamanho
+    # Converter para escala de cinza e padronizar tamanho da imagem
     gray = cv2.cvtColor(imagem_np, cv2.COLOR_RGB2GRAY)
     gray_resized = cv2.resize(gray, (1000, 1400))
     img_debug = cv2.cvtColor(gray_resized, cv2.COLOR_GRAY2RGB)
@@ -50,12 +50,17 @@ def processar_gabarito_preciso(imagem_np):
 
     respostas_lidas = {}
 
-    # Mapeamento com margem de recuo para não pegar linhas da tabela
+    # COORDENADAS RECALIBRADAS COM BASE NO PRINT REAL DO CELULAR:
+    # (inicio_q, (y1, y2), (x1, x2))
     blocos = {
-        "Biologia": (1, (430, 720), (230, 470)),
-        "Química": (21, (430, 720), (670, 910)),
-        "Física": (11, (830, 1120), (230, 470)),
-        "Matemática": (31, (830, 1120), (670, 910))
+        # Biologia: Q01-Q10 | Y: desceu de 430 para 590-830 | X: ajustado para 200-380
+        "Biologia": (1, (590, 830), (200, 380)),
+        # Química: Q21-Q30 | Y: desceu de 430 para 590-830 | X: recuado de 670-910 para 600-780
+        "Química": (21, (590, 830), (600, 780)),
+        # Física: Q11-Q20 | Y: ajustado para 920-1160 | X: mantido alinhado com Biologia (200-380)
+        "Física": (11, (920, 1160), (200, 380)),
+        # Matemática: Q31-Q40 | Y: ajustado para 920-1160 | X: mantido alinhado com Química (600-780)
+        "Matemática": (31, (920, 1160), (600, 780))
     }
 
     for materia, (q_inicio, (y1, y2), (x1, x2)) in blocos.items():
@@ -78,12 +83,12 @@ def processar_gabarito_preciso(imagem_np):
                 bolha = sub_thresh[by1:by2, bx1:bx2]
                 hb, wb = bolha.shape
                 
-                # Pega estritamente o centro do círculo (descarta as bordas)
+                # Pega 40% do miolo central da bolha
                 miolo = bolha[int(hb*0.3):int(hb*0.7), int(wb*0.3):int(wb*0.7)]
                 total_preenchido = cv2.countNonZero(miolo)
                 pixels_por_opcao.append(total_preenchido)
 
-                # Desenha marcação verde/vermelha na imagem para depuração
+                # Desenha o quadrado vermelho na imagem de depuração
                 abs_x1 = x1 + bx1 + int(wb*0.3)
                 abs_y1 = y1 + by1 + int(hb*0.3)
                 abs_x2 = x1 + bx1 + int(wb*0.7)
@@ -92,7 +97,6 @@ def processar_gabarito_preciso(imagem_np):
 
             max_pixels = max(pixels_por_opcao)
             
-            # Identifica a opção marcada
             if max_pixels > 10:
                 idx_marcado = pixels_por_opcao.index(max_pixels)
                 respostas_lidas[questao_num] = OPCOES[idx_marcado]
@@ -162,7 +166,7 @@ if imagem_capturada is not None:
         st.divider()
         st.subheader(f"🏆 NOTA FINAL: {nota_final:.1f} / 10,0")
 
-        # Exibe imagem com os locais de leitura marcados para verificação
+        # Exibe imagem para depuração visual dos marcadores
         with st.expander("🔍 Ver mapa de pontos analisados pelo app"):
-            st.image(img_debug, caption="Quadros azuis representam os centros das bolhas lidas", use_container_width=True)
+            st.image(img_debug, caption="Quadros vermelhos mostram os locais exatos onde o app está lendo cada alternativa", use_container_width=True)
             st.write(respostas_aluno)
