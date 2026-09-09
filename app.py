@@ -8,7 +8,7 @@ import google.generativeai as genai
 
 st.set_page_config(page_title="Corretor Inteligente CEDAC", layout="wide")
 
-st.title("📝 Corretor Automático de Cartão-Resposta (IA)")
+st.title("📝 Corretor Automático de Cartão-Resposta")
 st.subheader("C.E. DEP. ALEXANDRE COSTA - CEDAC")
 
 OPCOES = ["A", "B", "C", "D", "E"]
