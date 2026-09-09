@@ -67,7 +67,7 @@ with st.sidebar.expander("📝 Editar Questão por Questão"):
 
 def ler_gabarito_com_ia(imagem_pil, api_key):
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-1.5-flash")
+    model = genai.GenerativeModel("gemini-2.5-flash")
     
     prompt = """
     Análise visual de Cartão-Resposta (OMR).
