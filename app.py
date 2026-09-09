@@ -6,10 +6,94 @@ import streamlit as st
 from PIL import Image
 import google.generativeai as genai
 
-st.set_page_config(page_title="Corretor Inteligente CEDAC", layout="wide")
+# Configuração da página
+st.set_page_config(
+    page_title="Corretor CEDAC",
+    page_icon="🎓",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-st.title("📝 Corretor Automático de Cartão-Resposta")
-st.subheader("C.E. DEP. ALEXANDRE COSTA - CEDAC")
+# --- ESTILIZAÇÃO CSS PERSONALIZADA ---
+st.markdown("""
+    <style>
+    /* Fundo geral e tipografia */
+    .main {
+        background-color: #f8fafc;
+    }
+    
+    /* Card de cabeçalho principal */
+    .header-card {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        padding: 24px;
+        border-radius: 16px;
+        color: white;
+        text-align: center;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .header-card h1 {
+        color: white !important;
+        font-weight: 700 !important;
+        font-size: 1.8rem !important;
+        margin-bottom: 4px !important;
+    }
+    .header-card p {
+        color: #e0f2fe !important;
+        font-size: 1.0rem !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* Cards de informação e áreas */
+    .info-card {
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-left: 5px solid #3b82f6;
+        padding: 16px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    /* Placa de Nota Final */
+    .grade-box {
+        background: #f0fdf4;
+        border: 2px solid #22c55e;
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+        margin-top: 15px;
+    }
+    .grade-box h2 {
+        color: #15803d !important;
+        margin: 0 !important;
+        font-size: 2rem !important;
+    }
+
+    /* Sidebar personalizada */
+    section[data-testid="stSidebar"] {
+        background-color: #0f172a !important;
+    }
+    section[data-testid="stSidebar"] * {
+        color: #f8fafc !important;
+    }
+    section[data-testid="stSidebar"] .stButton button {
+        background-color: #2563eb !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# --- CABEÇALHO ELEGANTE ---
+st.markdown("""
+    <div class="header-card">
+        <h1>🎓 Corretor Inteligente CEDAC</h1>
+        <p>C.E. DEP. ALEXANDRE COSTA — Correção Automática por IA</p>
+    </div>
+""", unsafe_allow_html=True)
 
 OPCOES = ["A", "B", "C", "D", "E"]
 
@@ -45,8 +129,8 @@ ESTRUTURA_AREAS = {
 }
 
 # --- BARRA LATERAL: SELEÇÃO DA ÁREA ---
-st.sidebar.header("⚙️ Configuração do Simulado")
-area_selecionada = st.sidebar.selectbox("Escolha a Área da Prova:", list(ESTRUTURA_AREAS.keys()))
+st.sidebar.markdown("### ⚙️ Painel do Professor")
+area_selecionada = st.sidebar.selectbox("📚 Escolha a Área da Prova:", list(ESTRUTURA_AREAS.keys()))
 
 dados_area = ESTRUTURA_AREAS[area_selecionada]
 arquivo_gabarito_atual = dados_area["arquivo"]
@@ -70,14 +154,15 @@ gabarito_ativo = carregar_gabarito_area(arquivo_gabarito_atual)
 
 # --- BARRA LATERAL: GERENCIAMENTO DE GABARITO ---
 st.sidebar.divider()
-st.sidebar.header(f"🎯 Gabarito: {area_selecionada}")
+st.sidebar.markdown(f"#### 🎯 Gabarito Oficial: {area_selecionada}")
 
 texto_gabarito = st.sidebar.text_area(
-    "Entrada rápida (ex: A,B,C,D... ou 40 letras juntas):",
-    placeholder="Cole aqui as 40 respostas para esta área..."
+    "Entrada rápida (ex: A,B,C,D... ou 40 letras):",
+    placeholder="Cole as 40 respostas aqui...",
+    height=100
 )
 
-if st.sidebar.button("⚡ Salvar Gabarito desta Área"):
+if st.sidebar.button("⚡ Salvar Gabarito Oficial", use_container_width=True):
     letras = [char.upper() for char in texto_gabarito.replace(" ", "").replace(",", "").replace("\n", "") if char.upper() in OPCOES]
     if len(letras) == 40:
         gabarito_novo = {str(i+1): letras[i] for i in range(40)}
@@ -87,16 +172,16 @@ if st.sidebar.button("⚡ Salvar Gabarito desta Área"):
     else:
         st.sidebar.error(f"Encontradas {len(letras)} alternativas. Necessário exatas 40 respostas.")
 
-with st.sidebar.expander("📝 Editar Questão por Questão"):
+with st.sidebar.expander("✏️ Editar Questão por Questão"):
     gabarito_temp = {}
     for i in range(1, 41):
         idx_padrao = OPCOES.index(gabarito_ativo.get(str(i), "A"))
         gabarito_temp[str(i)] = st.selectbox(f"Questão {i:02d}:", OPCOES, index=idx_padrao, key=f"q_select_{area_selecionada}_{i}")
     
-    if st.button("💾 Salvar Edição Manual"):
+    if st.button("💾 Salvar Edição Manual", use_container_width=True):
         salvar_gabarito_area(arquivo_gabarito_atual, gabarito_temp)
         gabarito_ativo = gabarito_temp
-        st.success(f"Gabarito manual de {area_selecionada} salvo!")
+        st.success(f"Gabarito manual salvo!")
 
 # --- PROCESSAMENTO COM IA (GEMINI 3.6 FLASH) ---
 def ler_gabarito_com_ia(imagem_pil, api_key, estrutura):
@@ -131,43 +216,45 @@ def ler_gabarito_com_ia(imagem_pil, api_key, estrutura):
     
     return json.loads(texto_resposta)
 
-# --- CHAVE DA API GEMINI ---
-api_key_env = st.secrets.get("GEMINI_API_KEY", "")
-api_key = st.sidebar.text_input("Chave API Gemini:", value=api_key_env, type="password")
+# API Key obtida dos Secrets do Streamlit Cloud
+api_key = st.secrets.get("GEMINI_API_KEY", "")
 
 # --- INTERFACE PRINCIPAL ---
-st.write("---")
-st.info(f"📍 **Área Selecionada:** {area_selecionada}")
+st.markdown(f"""
+    <div class="info-card">
+        <strong>📍 Área Selecionada no Momento:</strong> <span style="color:#2563eb; font-weight:bold;">{area_selecionada}</span>
+    </div>
+""", unsafe_allow_html=True)
 
-# Padrão alterado para Galeria/Câmera NAtiva do Sistema
 opcao_envio = st.radio(
-    "Escolha a forma de envio:", 
-    ["Carregar Arquivo / Câmera do Celular", "Câmera Integrada (Navegador)"],
+    "📷 Como deseja enviar a foto do cartão-resposta?", 
+    ["Carregar Foto (Galeria ou Câmera do Celular)", "Usar Câmera Nativa do Navegador"],
     index=0
 )
 
 imagem_capturada = None
 
-if opcao_envio == "Carregar Arquivo / Câmera do Celular":
-    imagem_capturada = st.file_uploader("Selecione 'Câmera' ou escolha uma foto da galeria", type=["jpg", "jpeg", "png"])
+if opcao_envio == "Carregar Foto (Galeria ou Câmera do Celular)":
+    imagem_capturada = st.file_uploader("Selecione uma imagem ou abra a câmera", type=["jpg", "jpeg", "png"])
 else:
-    imagem_capturada = st.camera_input("Tire a foto do cartão-resposta")
+    imagem_capturada = st.camera_input("Posicione a folha de resposta na câmera")
 
 if imagem_capturada is not None:
     image = Image.open(imagem_capturada)
 
-    col1, col2 = st.columns([1, 1])
+    col1, col2 = st.columns([1, 1], gap="medium")
 
     with col1:
-        st.image(image, caption="Gabarito Capturado", use_container_width=True)
+        st.markdown("##### 📄 Cartão Capturado")
+        st.image(image, use_container_width=True)
 
     with col2:
-        st.write("### 📊 Resultado da Correção")
+        st.markdown("##### 📊 Relatório de Desempenho")
         
         if not api_key:
-            st.error("⚠️ Insira a Chave de API do Gemini no menu lateral para ativar a leitura por IA.")
+            st.error("⚠️ Chave de API do Gemini não encontrada nos Secrets. Por favor, configure a chave no painel do Streamlit.")
         else:
-            with st.spinner("A IA está analisando a foto e lendo as respostas..."):
+            with st.spinner("✨ A IA está lendo o cartão-resposta..."):
                 try:
                     respostas_aluno = ler_gabarito_com_ia(image, api_key, materias_atuais)
                     
@@ -182,23 +269,27 @@ if imagem_capturada is not None:
                     total_acertos = sum(pontos.values())
                     nota_final = (total_acertos / 40.0) * 10.0
 
-                    st.markdown("#### Campo Exclusivo da Banca")
-                    
+                    # Exibição organizada por disciplina
                     res_col1, res_col2 = st.columns(2)
                     itens = list(pontos.items())
                     
                     with res_col1:
-                        st.metric(itens[0][0], f"{itens[0][1]} / 10")
-                        st.metric(itens[2][0], f"{itens[2][1]} / 10")
+                        st.metric(label=f"📘 {itens[0][0]}", value=f"{itens[0][1]} / 10")
+                        st.metric(label=f"📙 {itens[2][0]}", value=f"{itens[2][1]} / 10")
                     with res_col2:
-                        st.metric(itens[1][0], f"{itens[1][1]} / 10")
-                        st.metric(itens[3][0], f"{itens[3][1]} / 10")
+                        st.metric(label=f"📗 {itens[1][0]}", value=f"{itens[1][1]} / 10")
+                        st.metric(label=f"📕 {itens[3][0]}", value=f"{itens[3][1]} / 10")
                         
-                    st.divider()
-                    st.subheader(f"🏆 NOTA FINAL: {nota_final:.1f} / 10,0")
+                    # Destaque da Nota Final
+                    st.markdown(f"""
+                        <div class="grade-box">
+                            <span style="color:#166534; font-weight:600; font-size:0.9rem;">NOTA FINAL DO SIMULADO</span>
+                            <h2>{nota_final:.1f} <span style="font-size:1.1rem; color:#15803d;">/ 10,0</span></h2>
+                        </div>
+                    """, unsafe_allow_html=True)
 
-                    with st.expander("🔍 Ver detalhes de cada questão lida pela IA"):
+                    with st.expander("🔍 Ver Raio-X detalhado de cada questão"):
                         st.json(respostas_aluno)
 
                 except Exception as e:
-                    st.error(f"Erro no processamento da imagem: {e}")
+                    st.error(f"Erro ao analisar a imagem: {e}")
