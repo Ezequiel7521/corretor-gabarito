@@ -2,3 +2,8 @@ streamlit
 opencv-python-headless
 numpy
 pillow
+streamlit
+opencv-python-headless
+numpy
+pillow
+google-generativeai
