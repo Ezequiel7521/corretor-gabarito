@@ -65,7 +65,7 @@ if imagem_capturada is not None:
     col1, col2 = st.columns([1, 1])
 
     with col1:
-        st.image(image, caption="Gabarito Capturado", use_column_width=True)
+        st.image(image, caption="Gabarito Capturado", use_container_width=True)
 
     with col2:
         st.write("### 📊 Resultado da Correção")
