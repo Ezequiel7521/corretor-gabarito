@@ -1,25 +1,3 @@
-import streamlit as st
-
-st.set_page_config(page_title="Corretor de Gabarito - SEDUC MA", layout="wide")
-
-# --- CORREÇÃO DE ESTILO CSS PARA OS CAMPOS DE SELEÇÃO (DROPDOWNS) ---
-st.markdown("""
-    <style>
-    /* Força o texto e o fundo das opções a ficarem bem visíveis */
-    div[data-baseweb="select"] > div {
-        background-color: #1f2937 !important;
-        color: #ffffff !important;
-        border-radius: 8px;
-    }
-    div[data-baseweb="select"] span {
-        color: #ffffff !important;
-        font-weight: bold !important;
-    }
-    div[role="listbox"] ul li {
-        color: #000000 !important;
-    }
-    </style>
-""", unsafe_allow_html=True)
 import json
 import os
 import cv2
@@ -100,6 +78,24 @@ st.markdown("""
         font-size: 2rem !important;
     }
 
+    /* CORREÇÃO DAS CAIXAS DE SELEÇÃO (VISIBILIDADE DO TEXTO) */
+    div[data-baseweb="select"] > div {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 8px !important;
+    }
+    div[data-baseweb="select"] span {
+        color: #0f172a !important;
+        font-weight: 600 !important;
+    }
+    div[data-baseweb="popover"] ul {
+        background-color: #ffffff !important;
+    }
+    div[data-baseweb="popover"] li {
+        color: #0f172a !important;
+    }
+
     /* Sidebar personalizada */
     section[data-testid="stSidebar"] {
         background-color: #0f172a !important;
@@ -121,7 +117,7 @@ st.markdown("""
 st.markdown("""
     <div class="header-card">
         <h1>🎓 Corretor Inteligente CEDAC</h1>
-        <p>C.E. DEP. ALEXANDRE COSTA — Correção Automática </p>
+        <p>C.E. DEP. ALEXANDRE COSTA — Correção Automática por IA</p>
         <div class="author-tag">Desenvolvido pelo Prof. Ezequiel</div>
     </div>
 """, unsafe_allow_html=True)
