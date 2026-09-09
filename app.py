@@ -84,26 +84,35 @@ st.markdown("""
         background-color: #0f172a !important;
     }
     
+    /* Textos padrão da sidebar */
     section[data-testid="stSidebar"] label, 
     section[data-testid="stSidebar"] h3, 
-    section[data-testid="stSidebar"] h4 {
+    section[data-testid="stSidebar"] h4,
+    section[data-testid="stSidebar"] p {
         color: #f8fafc !important;
     }
 
-    /* Painel do Expander (Editar Questão por Questão) */
+    /* FIX: TÍTULO DO EXPANDER ("Editar Questão por Questão") */
+    section[data-testid="stSidebar"] div[data-testid="stExpander"] details summary * {
+        color: #0f172a !important;
+        -webkit-text-fill-color: #0f172a !important;
+        font-weight: 700 !important;
+    }
+
+    /* Fundo do painel do Expander */
     section[data-testid="stSidebar"] div[data-testid="stExpander"] {
-        background-color: #1e293b !important;
-        border: 1px solid #334155 !important;
+        background-color: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
         border-radius: 8px !important;
     }
-    
-    /* Título do Expander */
-    section[data-testid="stSidebar"] div[data-testid="stExpander"] summary * {
-        color: #f8fafc !important;
+
+    /* Rótulos das questões dentro do Expander */
+    section[data-testid="stSidebar"] div[data-testid="stExpander"] label {
+        color: #0f172a !important;
         font-weight: 600 !important;
     }
 
-    /* CORREÇÃO DEFINITIVA DAS CAIXAS DE OPÇÃO (SELECTBOX / ALTERNATIVAS) */
+    /* CAIXAS DE SELEÇÃO (SELECTBOX) */
     div[data-baseweb="select"] {
         background-color: #ffffff !important;
         border-radius: 8px !important;
@@ -117,13 +126,7 @@ st.markdown("""
         font-weight: 700 !important;
     }
 
-    div[data-baseweb="select"] span {
-        color: #0f172a !important;
-        -webkit-text-fill-color: #0f172a !important;
-        font-weight: 700 !important;
-    }
-
-    /* Menu suspenso (lista de A, B, C, D, E ao clicar) */
+    /* Menu suspenso aberto (opções A, B, C, D, E) */
     div[role="listbox"] {
         background-color: #ffffff !important;
     }
