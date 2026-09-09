@@ -66,7 +66,6 @@ def salvar_gabarito_area(caminho_file, gabarito):
     with open(caminho_file, "w", encoding="utf-8") as f:
         json.dump(gabarito, f, ensure_ascii=False, indent=2)
 
-# Carrega o gabarito específico da área selecionada
 gabarito_ativo = carregar_gabarito_area(arquivo_gabarito_atual)
 
 # --- BARRA LATERAL: GERENCIAMENTO DE GABARITO ---
@@ -145,11 +144,9 @@ opcao_envio = st.radio("Escolha a forma de envio:", ["Tirar Foto (Câmera)", "Ca
 imagem_capturada = None
 
 if opcao_envio == "Tirar Foto (Câmera)":
-    # Botão manual para não abrir a câmera direto no rosto do usuário
-    abrir_camera = st.checkbox("📸 Abrir Câmera Traseira", value=False)
+    abrir_camera = st.checkbox("📸 Ativar Câmera", value=False)
     if abrir_camera:
-        # A opção 'environment' força o celular a utilizar a câmera traseira
-        imagem_capturada = st.camera_input("Centralize o cartão-resposta", camera_facing="environment")
+        imagem_capturada = st.camera_input("Tire a foto do cartão-resposta")
 else:
     imagem_capturada = st.file_uploader("Escolha a foto na galeria", type=["jpg", "jpeg", "png"])
 
