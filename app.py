@@ -79,43 +79,63 @@ st.markdown("""
         font-size: 2rem !important;
     }
 
-    /* ESTILIZAÇÃO DA SIDEBAR E EXPANDER */
+    /* ESTILIZAÇÃO DA SIDEBAR */
     section[data-testid="stSidebar"] {
         background-color: #0f172a !important;
     }
     
-    /* Textos gerais da Sidebar */
     section[data-testid="stSidebar"] label, 
     section[data-testid="stSidebar"] h3, 
     section[data-testid="stSidebar"] h4 {
         color: #f8fafc !important;
     }
 
-    /* Correção do Expander (Editar Questão por Questão) */
+    /* Painel do Expander (Editar Questão por Questão) */
     section[data-testid="stSidebar"] div[data-testid="stExpander"] {
         background-color: #1e293b !important;
         border: 1px solid #334155 !important;
         border-radius: 8px !important;
     }
-    section[data-testid="stSidebar"] div[data-testid="stExpander"] * {
-        color: #f1f5f9 !important;
+    
+    /* Título do Expander */
+    section[data-testid="stSidebar"] div[data-testid="stExpander"] summary * {
+        color: #f8fafc !important;
+        font-weight: 600 !important;
     }
 
-    /* Correção das caixas Selectbox (Opções A, B, C, D, E e Seleção de Áreas) */
+    /* CORREÇÃO DEFINITIVA DAS CAIXAS DE OPÇÃO (SELECTBOX / ALTERNATIVAS) */
     div[data-baseweb="select"] {
         background-color: #ffffff !important;
         border-radius: 8px !important;
+        border: 1px solid #cbd5e1 !important;
     }
+    
     div[data-baseweb="select"] * {
         color: #0f172a !important;
         fill: #0f172a !important;
-        font-weight: 600 !important;
+        -webkit-text-fill-color: #0f172a !important;
+        font-weight: 700 !important;
     }
+
+    div[data-baseweb="select"] span {
+        color: #0f172a !important;
+        -webkit-text-fill-color: #0f172a !important;
+        font-weight: 700 !important;
+    }
+
+    /* Menu suspenso (lista de A, B, C, D, E ao clicar) */
     div[role="listbox"] {
         background-color: #ffffff !important;
     }
+    
     div[role="listbox"] li {
         color: #0f172a !important;
+        background-color: #ffffff !important;
+        font-weight: 600 !important;
+    }
+
+    div[role="listbox"] li:hover {
+        background-color: #e2e8f0 !important;
     }
 
     /* Botões da Sidebar */
@@ -127,7 +147,7 @@ st.markdown("""
         font-weight: 600 !important;
     }
 
-    /* Assinatura "by Prof. Ezequiel" bem legível */
+    /* Assinatura "by Prof. Ezequiel" */
     .sidebar-signature {
         color: #38bdf8 !important;
         font-size: 0.85rem;
