@@ -93,7 +93,7 @@ st.markdown("""
         color: #f8fafc !important;
     }
 
-    /* Rótulo padrão dos campos (labels fuera do expander) */
+    /* Rótulo padrão dos campos fuera do expander */
     section[data-testid="stSidebar"] > div label,
     section[data-testid="stSidebar"] > div label * {
         color: #ffffff !important;
@@ -101,18 +101,31 @@ st.markdown("""
         font-weight: 600 !important;
     }
 
-    /* CONTAINER DO EXPANDER ("Editar Questão por Questão") */
+    /* CONTAINER DO EXPANDER (ABERTO E FECHADO) */
     section[data-testid="stSidebar"] div[data-testid="stExpander"] {
         background-color: #1e293b !important;
         border: 1px solid #334155 !important;
         border-radius: 8px !important;
     }
 
-    /* Cabeçalho/Título do Expander */
-    section[data-testid="stSidebar"] div[data-testid="stExpander"] details summary * {
-        color: #f8fafc !important;
-        -webkit-text-fill-color: #f8fafc !important;
+    /* Fundo fixo para o container quando aberto */
+    section[data-testid="stSidebar"] div[data-testid="stExpander"] details[open] {
+        background-color: #1e293b !important;
+    }
+
+    /* TÍTULO DO EXPANDER (Lápis e texto visíveis aberto e fechado) */
+    section[data-testid="stSidebar"] div[data-testid="stExpander"] summary,
+    section[data-testid="stSidebar"] div[data-testid="stExpander"] summary * {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
         font-weight: 700 !important;
+        background-color: transparent !important;
+    }
+
+    /* Ícone de seta do expander */
+    section[data-testid="stSidebar"] div[data-testid="stExpander"] summary svg {
+        fill: #ffffff !important;
+        color: #ffffff !important;
     }
 
     /* RÓTULO DOS NÚMEROS DAS QUESTÕES (ex: Questão 01:) */
