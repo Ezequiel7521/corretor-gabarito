@@ -1,3 +1,25 @@
+import streamlit as st
+
+st.set_page_config(page_title="Corretor de Gabarito - SEDUC MA", layout="wide")
+
+# --- CORREÇÃO DE ESTILO CSS PARA OS CAMPOS DE SELEÇÃO (DROPDOWNS) ---
+st.markdown("""
+    <style>
+    /* Força o texto e o fundo das opções a ficarem bem visíveis */
+    div[data-baseweb="select"] > div {
+        background-color: #1f2937 !important;
+        color: #ffffff !important;
+        border-radius: 8px;
+    }
+    div[data-baseweb="select"] span {
+        color: #ffffff !important;
+        font-weight: bold !important;
+    }
+    div[role="listbox"] ul li {
+        color: #000000 !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
 import json
 import os
 import cv2
