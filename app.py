@@ -106,10 +106,13 @@ st.markdown("""
         border-radius: 8px !important;
     }
 
-    /* Rótulos das questões dentro do Expander */
-    section[data-testid="stSidebar"] div[data-testid="stExpander"] label {
+    /* FIX: RÓTULOS DOS NÚMEROS DAS QUESTÕES (ex: Questão 01:) */
+    section[data-testid="stSidebar"] div[data-testid="stExpander"] label,
+    section[data-testid="stSidebar"] div[data-testid="stExpander"] label * {
         color: #0f172a !important;
-        font-weight: 600 !important;
+        -webkit-text-fill-color: #0f172a !important;
+        font-weight: 700 !important;
+        font-size: 0.95rem !important;
     }
 
     /* CAIXAS DE SELEÇÃO (SELECTBOX) */
