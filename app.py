@@ -99,7 +99,7 @@ st.markdown("""
 st.markdown("""
     <div class="header-card">
         <h1>🎓 Corretor Inteligente CEDAC</h1>
-        <p>C.E. DEP. ALEXANDRE COSTA — Correção Automática por IA</p>
+        <p>C.E. DEP. ALEXANDRE COSTA — Correção Automática </p>
         <div class="author-tag">Desenvolvido pelo Prof. Ezequiel</div>
     </div>
 """, unsafe_allow_html=True)
