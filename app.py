@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- ESTILIZAÇÃO CSS PERSONALIZADA ---
+# --- ESTILIZAÇÃO CSS CORRIGIDA PARA VISIBILIDADE DOS SELECTBOXES ---
 st.markdown("""
     <style>
     /* Fundo geral e tipografia */
@@ -44,7 +44,6 @@ st.markdown("""
         font-size: 1.0rem !important;
         margin-bottom: 0 !important;
     }
-    /* Assinatura discreta no cabeçalho */
     .author-tag {
         font-size: 0.75rem !important;
         color: rgba(255, 255, 255, 0.6) !important;
@@ -52,15 +51,17 @@ st.markdown("""
         font-style: italic;
     }
 
-    /* Cards de informação e áreas */
+    /* Card da Área Selecionada */
     .info-card {
         background-color: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-left: 5px solid #3b82f6;
+        border: 1px solid #cbd5e1;
+        border-left: 5px solid #2563eb;
         padding: 16px;
         border-radius: 10px;
         margin-bottom: 20px;
         box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        color: #0f172a !important;
+        font-size: 1.1rem;
     }
 
     /* Placa de Nota Final */
@@ -78,29 +79,44 @@ st.markdown("""
         font-size: 2rem !important;
     }
 
-    /* CORREÇÃO DAS CAIXAS DE SELEÇÃO (VISIBILIDADE DO TEXTO) */
-    div[data-baseweb="select"] > div {
+    /* CORREÇÃO DEFINITIVA DE VISIBILIDADE PARA SELECTBOX (GABARITO E ÁREAS) */
+    div[data-baseweb="select"] {
         background-color: #ffffff !important;
-        color: #0f172a !important;
-        border: 1px solid #cbd5e1 !important;
         border-radius: 8px !important;
     }
-    div[data-baseweb="select"] span {
+    
+    div[data-baseweb="select"] * {
         color: #0f172a !important;
+        fill: #0f172a !important;
         font-weight: 600 !important;
     }
-    div[data-baseweb="popover"] ul {
+
+    /* Estilo para a caixa fechada e a seta */
+    div[data-baseweb="select"] > div {
+        background-color: #ffffff !important;
+        border: 2px solid #94a3b8 !important;
+        border-radius: 8px !important;
+    }
+
+    /* Estilo das opções no menu suspenso que se abre */
+    div[role="listbox"] {
         background-color: #ffffff !important;
     }
-    div[data-baseweb="popover"] li {
+    
+    div[role="listbox"] li {
         color: #0f172a !important;
+        background-color: #ffffff !important;
+    }
+
+    div[role="listbox"] li:hover {
+        background-color: #e2e8f0 !important;
     }
 
     /* Sidebar personalizada */
     section[data-testid="stSidebar"] {
         background-color: #0f172a !important;
     }
-    section[data-testid="stSidebar"] * {
+    section[data-testid="stSidebar"] label, section[data-testid="stSidebar"] h3, section[data-testid="stSidebar"] h4 {
         color: #f8fafc !important;
     }
     section[data-testid="stSidebar"] .stButton button {
@@ -210,7 +226,6 @@ with st.sidebar.expander("✏️ Editar Questão por Questão"):
         gabarito_ativo = gabarito_temp
         st.success(f"Gabarito manual salvo!")
 
-# Assinatura discreta no fim da barra lateral
 st.sidebar.divider()
 st.sidebar.caption("💡 *by Prof. Ezequiel*")
 
@@ -253,7 +268,7 @@ api_key = st.secrets.get("GEMINI_API_KEY", "")
 # --- INTERFACE PRINCIPAL ---
 st.markdown(f"""
     <div class="info-card">
-        <strong>📍 Área Selecionada no Momento:</strong> <span style="color:#2563eb; font-weight:bold;">{area_selecionada}</span>
+        📌 <strong>Área Selecionada:</strong> <span style="color:#1e40af; font-weight:bold;">{area_selecionada}</span>
     </div>
 """, unsafe_allow_html=True)
 
@@ -300,7 +315,6 @@ if imagem_capturada is not None:
                     total_acertos = sum(pontos.values())
                     nota_final = (total_acertos / 40.0) * 10.0
 
-                    # Exibição organizada por disciplina
                     res_col1, res_col2 = st.columns(2)
                     itens = list(pontos.items())
                     
@@ -311,7 +325,6 @@ if imagem_capturada is not None:
                         st.metric(label=f"📗 {itens[1][0]}", value=f"{itens[1][1]} / 10")
                         st.metric(label=f"📕 {itens[3][0]}", value=f"{itens[3][1]} / 10")
                         
-                    # Destaque da Nota Final
                     st.markdown(f"""
                         <div class="grade-box">
                             <span style="color:#166534; font-weight:600; font-size:0.9rem;">NOTA FINAL DO SIMULADO</span>
