@@ -31,6 +31,7 @@ st.markdown("""
         text-align: center;
         margin-bottom: 25px;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        position: relative;
     }
     .header-card h1 {
         color: white !important;
@@ -42,6 +43,13 @@ st.markdown("""
         color: #e0f2fe !important;
         font-size: 1.0rem !important;
         margin-bottom: 0 !important;
+    }
+    /* Assinatura discreta no cabeçalho */
+    .author-tag {
+        font-size: 0.75rem !important;
+        color: rgba(255, 255, 255, 0.6) !important;
+        margin-top: 8px !important;
+        font-style: italic;
     }
 
     /* Cards de informação e áreas */
@@ -87,11 +95,12 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- CABEÇALHO ELEGANTE ---
+# --- CABEÇALHO ELEGANTE COM ASSINATURA ---
 st.markdown("""
     <div class="header-card">
         <h1>🎓 Corretor Inteligente CEDAC</h1>
-        <p>C.E. DEP. ALEXANDRE COSTA — Correção Automática</p>
+        <p>C.E. DEP. ALEXANDRE COSTA — Correção Automática por IA</p>
+        <div class="author-tag">Desenvolvido pelo Prof. Ezequiel</div>
     </div>
 """, unsafe_allow_html=True)
 
@@ -182,6 +191,10 @@ with st.sidebar.expander("✏️ Editar Questão por Questão"):
         salvar_gabarito_area(arquivo_gabarito_atual, gabarito_temp)
         gabarito_ativo = gabarito_temp
         st.success(f"Gabarito manual salvo!")
+
+# Assinatura discreta no fim da barra lateral
+st.sidebar.divider()
+st.sidebar.caption("💡 *by Prof. Ezequiel*")
 
 # --- PROCESSAMENTO COM IA (GEMINI 3.6 FLASH) ---
 def ler_gabarito_com_ia(imagem_pil, api_key, estrutura):
