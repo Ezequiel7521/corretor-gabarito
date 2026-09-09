@@ -14,6 +14,33 @@ st.subheader("C.E. DEP. ALEXANDRE COSTA - CEDAC")
 ARQUIVO_GABARITO = "gabarito_oficial.json"
 OPCOES = ["A", "B", "C", "D", "E"]
 
+# --- DEFINIÇÃO DAS ÁREAS E MATÉRIAS ---
+ESTRUTURA_AREAS = {
+    "Ciências da Natureza e Matemática": [
+        ("Biologia", 1, 10),
+        ("Física", 11, 20),
+        ("Química", 21, 30),
+        ("Matemática", 31, 40)
+    ],
+    "Ciências Humanas": [
+        ("História", 1, 10),
+        ("Geografia", 11, 20),
+        ("Sociologia", 21, 30),
+        ("Filosofia", 31, 40)
+    ],
+    "Linguagens e Códigos": [
+        ("Língua Portuguesa", 1, 10),
+        ("Língua Inglesa", 11, 20),
+        ("Artes", 21, 30),
+        ("Educação Física", 31, 40)
+    ]
+}
+
+# --- BARRA LATERAL: SELEÇÃO DA ÁREA ---
+st.sidebar.header("⚙️ Configuração do Simulado")
+area_selecionada = st.sidebar.selectbox("Escolha a Área da Prova:", list(ESTRUTURA_AREAS.keys()))
+materias_atuais = ESTRUTURA_AREAS[area_selecionada]
+
 # --- FUNÇÕES DE PERSISTÊNCIA DO GABARITO ---
 def carregar_gabarito_salvo():
     if os.path.exists(ARQUIVO_GABARITO):
@@ -32,9 +59,9 @@ if "gabarito" not in st.session_state:
     st.session_state.gabarito = carregar_gabarito_salvo()
 
 # --- BARRA LATERAL: GERENCIAMENTO DE GABARITO ---
+st.sidebar.divider()
 st.sidebar.header("🎯 Gabarito Oficial")
 
-# Entrada rápida via texto (cole todas as respostas de uma vez)
 texto_gabarito = st.sidebar.text_area(
     "Entrada rápida (ex: A,B,C,D... ou 40 letras juntas):",
     placeholder="Cole aqui as 40 respostas (ex: A B C D E...)"
@@ -49,9 +76,6 @@ if st.sidebar.button("⚡ Processar Entrada Rápida"):
     else:
         st.sidebar.error(f"Encontradas {len(letras)} alternativas válidas. O gabarito precisa ter exatamente 40 respostas.")
 
-st.sidebar.divider()
-
-# Ajuste individual questão por questão
 with st.sidebar.expander("📝 Editar Questão por Questão"):
     gabarito_temp = {}
     for i in range(1, 41):
@@ -63,29 +87,27 @@ with st.sidebar.expander("📝 Editar Questão por Questão"):
         salvar_gabarito_local(gabarito_temp)
         st.success("Gabarito manual salvo com sucesso!")
 
-# --- PROCESSAMENTO COM IA (VISÃO COMPUTACIONAL AVANÇADA) ---
-
-def ler_gabarito_com_ia(imagem_pil, api_key):
+# --- PROCESSAMENTO COM IA (GEMINI 3.6 FLASH) ---
+def ler_gabarito_com_ia(imagem_pil, api_key, estrutura):
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-3.6-flash")
     
-    prompt = """
+    descricao_materias = "\n".join([f"- {m[0]}: Questões {m[1]:02d} a {m[2]:02d}" for m in estrutura])
+    
+    prompt = f"""
     Análise visual de Cartão-Resposta (OMR).
     Sua tarefa é identificar a alternativa assinalada (preenchida a caneta/lápis) para as 40 questões da folha.
-    As questões estão divididas nas seguintes matérias:
-    - Biologia: Questões 01 a 10
-    - Física: Questões 11 a 20
-    - Química: Questões 21 a 30
-    - Matemática: Questões 31 a 40
+    As questões estão divididas nos 4 blocos da folha da seguinte forma:
+    {descricao_materias}
 
     Retorne EXATAMENTE um JSON válido com a numeração de 1 a 40 no seguinte formato, sem texto adicional:
-    {
+    {{
       "1": "A",
       "2": "C",
       "3": "Sem Resposta",
       ...
       "40": "E"
-    }
+    }}
     Se houver rasura ou mais de uma alternativa preenchida na mesma questão, marque como "Rasura".
     Se a bolha estiver vazia, marque como "Sem Resposta".
     """
@@ -93,18 +115,18 @@ def ler_gabarito_com_ia(imagem_pil, api_key):
     response = model.generate_content([prompt, imagem_pil])
     texto_resposta = response.text.strip()
     
-    # Limpa formatação Markdown se houver
     if texto_resposta.startswith("```json"):
         texto_resposta = texto_resposta.replace("```json", "").replace("```", "").strip()
     
     return json.loads(texto_resposta)
 
-# --- CHAVE DA API GEMINI (CONFIGURAÇÃO NO STREAMLIT) ---
+# --- CHAVE DA API GEMINI ---
 api_key_env = st.secrets.get("GEMINI_API_KEY", "")
 api_key = st.sidebar.text_input("Chave API Gemini:", value=api_key_env, type="password")
 
 # --- INTERFACE PRINCIPAL ---
 st.write("---")
+st.info(f"📍 **Área Ativa:** {area_selecionada}")
 
 opcao_envio = st.radio("Escolha a forma de envio:", ["Tirar Foto (Câmera)", "Carregar Arquivo (Galeria)"])
 
@@ -131,25 +153,15 @@ if imagem_capturada is not None:
         else:
             with st.spinner("A IA está analisando a foto e lendo as respostas..."):
                 try:
-                    respostas_aluno = ler_gabarito_com_ia(image, api_key)
+                    respostas_aluno = ler_gabarito_com_ia(image, api_key, materias_atuais)
                     
-                    pontos = {"Biologia": 0, "Física": 0, "Química": 0, "Matemática": 0}
-                    
-                    for q in range(1, 11):
-                        if respostas_aluno.get(str(q)) == st.session_state.gabarito.get(str(q)):
-                            pontos["Biologia"] += 1
-                            
-                    for q in range(11, 21):
-                        if respostas_aluno.get(str(q)) == st.session_state.gabarito.get(str(q)):
-                            pontos["Física"] += 1
-                            
-                    for q in range(21, 31):
-                        if respostas_aluno.get(str(q)) == st.session_state.gabarito.get(str(q)):
-                            pontos["Química"] += 1
-                            
-                    for q in range(31, 41):
-                        if respostas_aluno.get(str(q)) == st.session_state.gabarito.get(str(q)):
-                            pontos["Matemática"] += 1
+                    pontos = {}
+                    for mat_nome, q_inicio, q_fim in materias_atuais:
+                        acertos_mat = sum(
+                            1 for q in range(q_inicio, q_fim + 1) 
+                            if respostas_aluno.get(str(q)) == st.session_state.gabarito.get(str(q))
+                        )
+                        pontos[mat_nome] = acertos_mat
 
                     total_acertos = sum(pontos.values())
                     nota_final = (total_acertos / 40.0) * 10.0
@@ -157,12 +169,14 @@ if imagem_capturada is not None:
                     st.markdown("#### Campo Exclusivo da Banca")
                     
                     res_col1, res_col2 = st.columns(2)
+                    itens = list(pontos.items())
+                    
                     with res_col1:
-                        st.metric("Biologia", f"{pontos['Biologia']} / 10")
-                        st.metric("Química", f"{pontos['Química']} / 10")
+                        st.metric(itens[0][0], f"{itens[0][1]} / 10")
+                        st.metric(itens[2][0], f"{itens[2][1]} / 10")
                     with res_col2:
-                        st.metric("Física", f"{pontos['Física']} / 10")
-                        st.metric("Matemática", f"{pontos['Matemática']} / 10")
+                        st.metric(itens[1][0], f"{itens[1][1]} / 10")
+                        st.metric(itens[3][0], f"{itens[3][1]} / 10")
                         
                     st.divider()
                     st.subheader(f"🏆 NOTA FINAL: {nota_final:.1f} / 10,0")
