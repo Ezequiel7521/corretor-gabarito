@@ -11,81 +11,93 @@ st.set_page_config(page_title="Corretor Inteligente CEDAC", layout="wide")
 st.title("📝 Corretor Automático de Cartão-Resposta (IA)")
 st.subheader("C.E. DEP. ALEXANDRE COSTA - CEDAC")
 
-ARQUIVO_GABARITO = "gabarito_oficial.json"
 OPCOES = ["A", "B", "C", "D", "E"]
 
-# --- DEFINIÇÃO DAS ÁREAS E MATÉRIAS ---
+# --- DEFINIÇÃO DAS ÁREAS E ESTRUTURA DE ARQUIVOS DE GABARITO ---
 ESTRUTURA_AREAS = {
-    "Ciências da Natureza e Matemática": [
-        ("Biologia", 1, 10),
-        ("Física", 11, 20),
-        ("Química", 21, 30),
-        ("Matemática", 31, 40)
-    ],
-    "Ciências Humanas": [
-        ("História", 1, 10),
-        ("Geografia", 11, 20),
-        ("Sociologia", 21, 30),
-        ("Filosofia", 31, 40)
-    ],
-    "Linguagens e Códigos": [
-        ("Língua Portuguesa", 1, 10),
-        ("Língua Inglesa", 11, 20),
-        ("Artes", 21, 30),
-        ("Educação Física", 31, 40)
-    ]
+    "Ciências da Natureza e Matemática": {
+        "arquivo": "gabarito_natureza.json",
+        "materias": [
+            ("Biologia", 1, 10),
+            ("Física", 11, 20),
+            ("Química", 21, 30),
+            ("Matemática", 31, 40)
+        ]
+    },
+    "Ciências Humanas": {
+        "arquivo": "gabarito_humanas.json",
+        "materias": [
+            ("História", 1, 10),
+            ("Geografia", 11, 20),
+            ("Sociologia", 21, 30),
+            ("Filosofia", 31, 40)
+        ]
+    },
+    "Linguagens e Códigos": {
+        "arquivo": "gabarito_linguagens.json",
+        "materias": [
+            ("Língua Portuguesa", 1, 10),
+            ("Língua Inglesa", 11, 20),
+            ("Artes", 21, 30),
+            ("Educação Física", 31, 40)
+        ]
+    }
 }
 
 # --- BARRA LATERAL: SELEÇÃO DA ÁREA ---
 st.sidebar.header("⚙️ Configuração do Simulado")
 area_selecionada = st.sidebar.selectbox("Escolha a Área da Prova:", list(ESTRUTURA_AREAS.keys()))
-materias_atuais = ESTRUTURA_AREAS[area_selecionada]
 
-# --- FUNÇÕES DE PERSISTÊNCIA DO GABARITO ---
-def carregar_gabarito_salvo():
-    if os.path.exists(ARQUIVO_GABARITO):
+dados_area = ESTRUTURA_AREAS[area_selecionada]
+arquivo_gabarito_atual = dados_area["arquivo"]
+materias_atuais = dados_area["materias"]
+
+# --- FUNÇÕES DE PERSISTÊNCIA DE GABARITO POR ÁREA ---
+def carregar_gabarito_area(caminho_file):
+    if os.path.exists(caminho_file):
         try:
-            with open(ARQUIVO_GABARITO, "r", encoding="utf-8") as f:
+            with open(caminho_file, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
             pass
     return {str(i): "A" for i in range(1, 41)}
 
-def salvar_gabarito_local(gabarito):
-    with open(ARQUIVO_GABARITO, "w", encoding="utf-8") as f:
+def salvar_gabarito_area(caminho_file, gabarito):
+    with open(caminho_file, "w", encoding="utf-8") as f:
         json.dump(gabarito, f, ensure_ascii=False, indent=2)
 
-if "gabarito" not in st.session_state:
-    st.session_state.gabarito = carregar_gabarito_salvo()
+# Carrega o gabarito específico da área selecionada
+gabarito_ativo = carregar_gabarito_area(arquivo_gabarito_atual)
 
 # --- BARRA LATERAL: GERENCIAMENTO DE GABARITO ---
 st.sidebar.divider()
-st.sidebar.header("🎯 Gabarito Oficial")
+st.sidebar.header(f"🎯 Gabarito: {area_selecionada}")
 
 texto_gabarito = st.sidebar.text_area(
     "Entrada rápida (ex: A,B,C,D... ou 40 letras juntas):",
-    placeholder="Cole aqui as 40 respostas (ex: A B C D E...)"
+    placeholder="Cole aqui as 40 respostas para esta área..."
 )
 
-if st.sidebar.button("⚡ Processar Entrada Rápida"):
+if st.sidebar.button("⚡ Salvar Gabarito desta Área"):
     letras = [char.upper() for char in texto_gabarito.replace(" ", "").replace(",", "").replace("\n", "") if char.upper() in OPCOES]
     if len(letras) == 40:
-        st.session_state.gabarito = {str(i+1): letras[i] for i in range(40)}
-        salvar_gabarito_local(st.session_state.gabarito)
-        st.sidebar.success("Gabarito de 40 questões atualizado e salvo!")
+        gabarito_novo = {str(i+1): letras[i] for i in range(40)}
+        salvar_gabarito_area(arquivo_gabarito_atual, gabarito_novo)
+        gabarito_ativo = gabarito_novo
+        st.sidebar.success(f"Gabarito de {area_selecionada} salvo com sucesso!")
     else:
-        st.sidebar.error(f"Encontradas {len(letras)} alternativas válidas. O gabarito precisa ter exatamente 40 respostas.")
+        st.sidebar.error(f"Encontradas {len(letras)} alternativas. Necessário exatas 40 respostas.")
 
 with st.sidebar.expander("📝 Editar Questão por Questão"):
     gabarito_temp = {}
     for i in range(1, 41):
-        idx_padrao = OPCOES.index(st.session_state.gabarito.get(str(i), "A"))
-        gabarito_temp[str(i)] = st.selectbox(f"Questão {i:02d}:", OPCOES, index=idx_padrao, key=f"q_select_{i}")
+        idx_padrao = OPCOES.index(gabarito_ativo.get(str(i), "A"))
+        gabarito_temp[str(i)] = st.selectbox(f"Questão {i:02d}:", OPCOES, index=idx_padrao, key=f"q_select_{area_selecionada}_{i}")
     
-    if st.button("💾 Salvar Gabarito Manual"):
-        st.session_state.gabarito = gabarito_temp
-        salvar_gabarito_local(gabarito_temp)
-        st.success("Gabarito manual salvo com sucesso!")
+    if st.button("💾 Salvar Edição Manual"):
+        salvar_gabarito_area(arquivo_gabarito_atual, gabarito_temp)
+        gabarito_ativo = gabarito_temp
+        st.success(f"Gabarito manual de {area_selecionada} salvo!")
 
 # --- PROCESSAMENTO COM IA (GEMINI 3.6 FLASH) ---
 def ler_gabarito_com_ia(imagem_pil, api_key, estrutura):
@@ -96,7 +108,7 @@ def ler_gabarito_com_ia(imagem_pil, api_key, estrutura):
     
     prompt = f"""
     Análise visual de Cartão-Resposta (OMR).
-    Sua tarefa é identificar a alternativa assinalada (preenchida a caneta/lápis) para as 40 questões da folha.
+    Sua tarefa é identificar a alternativa assinalada para as 40 questões da folha.
     As questões estão divididas nos 4 blocos da folha da seguinte forma:
     {descricao_materias}
 
@@ -126,14 +138,18 @@ api_key = st.sidebar.text_input("Chave API Gemini:", value=api_key_env, type="pa
 
 # --- INTERFACE PRINCIPAL ---
 st.write("---")
-st.info(f"📍 **Área Ativa:** {area_selecionada}")
+st.info(f"📍 **Área Selecionada:** {area_selecionada}")
 
 opcao_envio = st.radio("Escolha a forma de envio:", ["Tirar Foto (Câmera)", "Carregar Arquivo (Galeria)"])
 
 imagem_capturada = None
 
 if opcao_envio == "Tirar Foto (Câmera)":
-    imagem_capturada = st.camera_input("Tire a foto do cartão-resposta")
+    # Botão manual para não abrir a câmera direto no rosto do usuário
+    abrir_camera = st.checkbox("📸 Abrir Câmera Traseira", value=False)
+    if abrir_camera:
+        # A opção 'environment' força o celular a utilizar a câmera traseira
+        imagem_capturada = st.camera_input("Centralize o cartão-resposta", camera_facing="environment")
 else:
     imagem_capturada = st.file_uploader("Escolha a foto na galeria", type=["jpg", "jpeg", "png"])
 
@@ -159,7 +175,7 @@ if imagem_capturada is not None:
                     for mat_nome, q_inicio, q_fim in materias_atuais:
                         acertos_mat = sum(
                             1 for q in range(q_inicio, q_fim + 1) 
-                            if respostas_aluno.get(str(q)) == st.session_state.gabarito.get(str(q))
+                            if respostas_aluno.get(str(q)) == gabarito_ativo.get(str(q))
                         )
                         pontos[mat_nome] = acertos_mat
 
