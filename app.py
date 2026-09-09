@@ -79,43 +79,52 @@ st.markdown("""
         font-size: 2rem !important;
     }
 
-    /* ESTILIZAÇÃO DA SIDEBAR */
+    /* --- SIDEBAR TOTALMENTE ESCURA E ALTO CONTRASTE --- */
     section[data-testid="stSidebar"] {
         background-color: #0f172a !important;
     }
     
-    /* Textos padrão da sidebar */
-    section[data-testid="stSidebar"] label, 
-    section[data-testid="stSidebar"] h3, 
+    /* Textos gerais da sidebar */
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
     section[data-testid="stSidebar"] h4,
     section[data-testid="stSidebar"] p {
         color: #f8fafc !important;
     }
 
-    /* FIX: TÍTULO DO EXPANDER ("Editar Questão por Questão") */
-    section[data-testid="stSidebar"] div[data-testid="stExpander"] details summary * {
-        color: #0f172a !important;
-        -webkit-text-fill-color: #0f172a !important;
-        font-weight: 700 !important;
+    /* Rótulo padrão dos campos (labels fuera do expander) */
+    section[data-testid="stSidebar"] > div label,
+    section[data-testid="stSidebar"] > div label * {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        font-weight: 600 !important;
     }
 
-    /* Fundo do painel do Expander */
+    /* CONTAINER DO EXPANDER ("Editar Questão por Questão") */
     section[data-testid="stSidebar"] div[data-testid="stExpander"] {
-        background-color: #f8fafc !important;
-        border: 1px solid #cbd5e1 !important;
+        background-color: #1e293b !important;
+        border: 1px solid #334155 !important;
         border-radius: 8px !important;
     }
 
-    /* FIX: RÓTULOS DOS NÚMEROS DAS QUESTÕES (ex: Questão 01:) */
+    /* Cabeçalho/Título do Expander */
+    section[data-testid="stSidebar"] div[data-testid="stExpander"] details summary * {
+        color: #f8fafc !important;
+        -webkit-text-fill-color: #f8fafc !important;
+        font-weight: 700 !important;
+    }
+
+    /* RÓTULO DOS NÚMEROS DAS QUESTÕES (ex: Questão 01:) */
     section[data-testid="stSidebar"] div[data-testid="stExpander"] label,
     section[data-testid="stSidebar"] div[data-testid="stExpander"] label * {
-        color: #0f172a !important;
-        -webkit-text-fill-color: #0f172a !important;
+        color: #38bdf8 !important; /* Azul claro brilhante para alto contraste */
+        -webkit-text-fill-color: #38bdf8 !important;
         font-weight: 700 !important;
         font-size: 0.95rem !important;
     }
 
-    /* CAIXAS DE SELEÇÃO (SELECTBOX) */
+    /* CAIXA DE SELEÇÃO DE ALTERNATIVAS (SELECTBOX) */
     div[data-baseweb="select"] {
         background-color: #ffffff !important;
         border-radius: 8px !important;
@@ -129,7 +138,7 @@ st.markdown("""
         font-weight: 700 !important;
     }
 
-    /* Menu suspenso aberto (opções A, B, C, D, E) */
+    /* Menu suspenso aberto (lista A, B, C, D, E) */
     div[role="listbox"] {
         background-color: #ffffff !important;
     }
@@ -142,6 +151,19 @@ st.markdown("""
 
     div[role="listbox"] li:hover {
         background-color: #e2e8f0 !important;
+    }
+
+    /* MENSAGENS DE ALERTA E SUCESSO NA SIDEBAR */
+    section[data-testid="stSidebar"] div[data-testid="stNotification"] {
+        background-color: #064e3b !important;
+        border: 1px solid #059669 !important;
+        border-radius: 8px !important;
+    }
+    
+    section[data-testid="stSidebar"] div[data-testid="stNotification"] * {
+        color: #34d399 !important;
+        -webkit-text-fill-color: #34d399 !important;
+        font-weight: 600 !important;
     }
 
     /* Botões da Sidebar */
@@ -259,7 +281,7 @@ with st.sidebar.expander("✏️ Editar Questão por Questão"):
     if st.button("💾 Salvar Edição Manual", use_container_width=True):
         salvar_gabarito_area(arquivo_gabarito_atual, gabarito_temp)
         gabarito_ativo = gabarito_temp
-        st.success(f"Gabarito manual salvo!")
+        st.sidebar.success(f"Gabarito manual salvo!")
 
 st.sidebar.divider()
 st.sidebar.markdown('<div class="sidebar-signature">💡 by Prof. Ezequiel</div>', unsafe_allow_html=True)
