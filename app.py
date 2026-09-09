@@ -139,16 +139,19 @@ api_key = st.sidebar.text_input("Chave API Gemini:", value=api_key_env, type="pa
 st.write("---")
 st.info(f"📍 **Área Selecionada:** {area_selecionada}")
 
-opcao_envio = st.radio("Escolha a forma de envio:", ["Tirar Foto (Câmera)", "Carregar Arquivo (Galeria)"])
+# Padrão alterado para Galeria/Câmera NAtiva do Sistema
+opcao_envio = st.radio(
+    "Escolha a forma de envio:", 
+    ["Carregar Arquivo / Câmera do Celular", "Câmera Integrada (Navegador)"],
+    index=0
+)
 
 imagem_capturada = None
 
-if opcao_envio == "Tirar Foto (Câmera)":
-    abrir_camera = st.checkbox("📸 Ativar Câmera", value=False)
-    if abrir_camera:
-        imagem_capturada = st.camera_input("Tire a foto do cartão-resposta")
+if opcao_envio == "Carregar Arquivo / Câmera do Celular":
+    imagem_capturada = st.file_uploader("Selecione 'Câmera' ou escolha uma foto da galeria", type=["jpg", "jpeg", "png"])
 else:
-    imagem_capturada = st.file_uploader("Escolha a foto na galeria", type=["jpg", "jpeg", "png"])
+    imagem_capturada = st.camera_input("Tire a foto do cartão-resposta")
 
 if imagem_capturada is not None:
     image = Image.open(imagem_capturada)
